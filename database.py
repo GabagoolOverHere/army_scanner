@@ -2,6 +2,7 @@ import mysql.connector
 import datetime
 from dotenv import load_dotenv
 import os
+import discord
 
 load_dotenv()
 
@@ -16,6 +17,15 @@ conn = mysql.connector.connect(
 
 class DB:
 
+    def prepare_datas_for_database(self, message_author: str, commander_name: str, message_content: int):
+        if self.find_player_by_name(message_author) is None:
+            self.create_player(message_author, commander_name, message_content)
+        else:
+            player_id = self.find_player_by_name(message_author)
+            self.update_player(commander_name, message_content,
+                             player_id[0])
+            self.delete_troops(player_id[0])
+
     def create_player(self, discord_name: str, commander_name: str, max_troop_size: int,
                       now=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')):
         conn.reconnect()
@@ -27,7 +37,7 @@ class DB:
         conn.commit()
         conn.close()
 
-    def find_player_by_name(self, discord_name):
+    def find_player_by_name(self, discord_name: str):
         conn.reconnect()
         c = conn.cursor()
         d = (discord_name,)
