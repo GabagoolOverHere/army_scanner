@@ -77,7 +77,7 @@ def scan_image(image):
     """
     scanned_img = unsharp_mask(binary_image(image))
     results = [result for result in pytesseract.image_to_string(scanned_img).split('\n') if
-               result != '' and result != '\x0c' and result != ' ']
+               result not in ('', ' ', '\x0c')]
     return results
 
 
