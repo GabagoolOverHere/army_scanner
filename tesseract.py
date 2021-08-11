@@ -77,10 +77,10 @@ def scan_image(image):
     """
     scanned_img = unsharp_mask(binary_image(image))
     results = [result for result in pytesseract.image_to_string(scanned_img).split('\n') if
-               result != '' and result != '\x0c']
+               result != '' and result != '\x0c' and result != ' ']
     return results
 
 
 if __name__ == '__main__':
-    datas = scan_image('https://cdn.discordapp.com/attachments/870419693901582476/871419180367376484/test4.png')
+    datas = scan_image('https://cdn.discordapp.com/attachments/872570436318273596/875009763136667719/unknown.png')
     print(datas)
