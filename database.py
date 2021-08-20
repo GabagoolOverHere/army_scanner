@@ -2,7 +2,6 @@ import mysql.connector
 import datetime
 from dotenv import load_dotenv
 import os
-import discord
 
 load_dotenv()
 

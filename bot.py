@@ -40,9 +40,21 @@ class ArmyBot(commands.Bot):
         )
         return embed
 
+    async def initialize_ocr_embed(self):
+        embed = discord.Embed(
+            color=discord.Colour.purple(),
+            title='OCR Input',
+            description='The OCR technology allow us to extract text from an image.\n\n'
+                        'To register your army, you have to upload a cropped screenshot of your army that you can get by pressing ALT, and hovering your cursor over your army, when you\'re on the map.'
+                        '\n\n'
+                        'Then, you have to attach your max troop size with your image, like shown in the image:'
+                        '\n\n'
+                        'And press Enter.'
+        )
+        return embed
+
     async def fill_datas(self, message: discord.Message, author: str, commander_name: str, max_troop_size: int, sorted_datas: list, sum_of_troops: int):
-        db.prepare_datas_for_database(author, commander_name,
-                                      max_troop_size)
+        db.prepare_datas_for_database(author, commander_name, max_troop_size)
         try:
             db.fill_troops(sorted_datas, author)
         except TypeError:
@@ -115,6 +127,12 @@ class ArmyBodCmd(commands.Cog):
         embed.set_thumbnail(url='https://tinyurl.com/38wauca2'),
         embed.set_footer(
             text='Here is an example:\n"Gabagool(91): Imperial Palatine Guard/14, Vlandian Sharpshooter/49, Imperial Legionary/19"')
+        await ctx.send(embed=embed)
+
+    @commands.command(name='ocr')
+    async def display_embed(self, ctx):
+        embed = await self.bot.initialize_ocr_embed()
+        embed.set_thumbnail(url='https://tinyurl.com/yettvk3w'),
         await ctx.send(embed=embed)
 
 
