@@ -53,7 +53,8 @@ class ArmyBot(commands.Bot):
         )
         return embed
 
-    async def fill_datas(self, message: discord.Message, author: str, commander_name: str, max_troop_size: int, sorted_datas: list, sum_of_troops: int):
+    async def fill_datas(self, message: discord.Message, author: str, commander_name: str, max_troop_size: int,
+                         sorted_datas: list, sum_of_troops: int):
         db.prepare_datas_for_database(author, commander_name, max_troop_size)
         try:
             db.fill_troops(sorted_datas, author)
@@ -84,12 +85,13 @@ class ArmyBot(commands.Bot):
                         return
                     commander_name = [data.rsplit(' ', 1)[0] for data in datas if data.endswith('%')][0]
                     total_troops_scanned = sum([int(re.search('[0-9]{1,2}', data).group(0)) for data in datas if
-                                     not data.endswith('%')])
+                                                not data.endswith('%')])
                     sorted_datas = [data.rsplit(' ', 1) for data in datas if
                                     not data.endswith('%')]
 
                     if total_troops_scanned < int(message.content):
-                        await self.fill_datas(message, str(message.author), commander_name, message.content, sorted_datas, total_troops_scanned)
+                        await self.fill_datas(message, str(message.author), commander_name, message.content,
+                                              sorted_datas, total_troops_scanned)
                     else:
                         await message.channel.send(
                             f'The number you gave is inferior to the sum of all the troops I scanned ({total_troops_scanned}). Please, retry.')
@@ -103,18 +105,22 @@ class ArmyBot(commands.Bot):
             else:
                 await message.channel.send('You have to upload an image.')
                 return
-        else:
+        elif message.content.startswith('/'):
             await self.process_commands(message)
-            if not message.content.startswith('/'):
-                commander_infos = message.content.split(':')[0]
-                commander_name = message.content.split('(')[0]
-                max_army_size = int(commander_infos.split('(')[1].rstrip(')'))
-                sorted_datas = [data.strip(' ').split('/') for data in message.content.split(':')[1].split(',')]
-                troop_nb_scanned = sum([int(data[1]) for data in sorted_datas])
-                if 96 > max_army_size > 4 and max_army_size > troop_nb_scanned:
-                    await self.fill_datas(message, str(message.author), commander_name, max_army_size, sorted_datas, troop_nb_scanned)
-                else:
-                    await message.channel.send('Check if your max army size is between 5 and 95 and the number of each troop you typed is correct.')
+            return
+        elif re.fullmatch(r'[A-Za-z]+\([0-9]{1,2}\): ?(([A-Za-z]+ )+[A-Za-z]+\/[0-9]{1,2},? ?)+',
+                          message.content):
+            commander_infos = message.content.split(':')[0]
+            commander_name = message.content.split('(')[0]
+            max_army_size = int(commander_infos.split('(')[1].rstrip(')'))
+            sorted_datas = [data.strip(' ').split('/') for data in message.content.split(':')[1].split(',')]
+            troop_nb_scanned = sum([int(data[1]) for data in sorted_datas])
+            if 96 > max_army_size > 4 and max_army_size > troop_nb_scanned:
+                await self.fill_datas(message, str(message.author), commander_name, max_army_size, sorted_datas,
+                                      troop_nb_scanned)
+            else:
+                await message.channel.send(
+                    'Check if your max army size is between 5 and 95 and the number of each troop you typed is correct.')
 
 
 class ArmyBodCmd(commands.Cog):
@@ -122,15 +128,15 @@ class ArmyBodCmd(commands.Cog):
         self.bot = _bot
 
     @commands.command(name='manual')
-    async def display_embed(self, ctx):
+    async def display_manual_embed(self, ctx):
         embed = await self.bot.initialize_manual_embed()
         embed.set_thumbnail(url='https://tinyurl.com/38wauca2'),
         embed.set_footer(
-            text='Here is an example:\n"Gabagool(91): Imperial Palatine Guard/14, Vlandian Sharpshooter/49, Imperial Legionary/19"')
+            text='Here is an example:\n"Gabagool(91): Imperial Palatine Guard/14, Vlandian Sharpshooter/49, Imperial Legionary/19" (without the quotation marks)')
         await ctx.send(embed=embed)
 
     @commands.command(name='ocr')
-    async def display_embed(self, ctx):
+    async def display_ocr_embed(self, ctx):
         embed = await self.bot.initialize_ocr_embed()
         embed.set_thumbnail(url='https://tinyurl.com/yettvk3w'),
         await ctx.send(embed=embed)
