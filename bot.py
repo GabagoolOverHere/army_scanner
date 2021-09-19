@@ -164,11 +164,12 @@ class ArmyBodCmd(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(name='stats', help='/stats player_name will display a chart describing the army of the player.')
-    async def display_quickchart(self, ctx, arg):
-        datas = db.get_player_stats(arg)
+    async def display_quickchart(self, ctx, *arg):
+        player = ' '.join(arg)
+        datas = db.get_player_stats(player)
         if datas:
             url = quickchart_army.get_quickchart([int(data[1]) for data in datas], [data[0] for data in datas])
-            initialized_embed = await self.bot.initialize_quickchart_embed(arg)
+            initialized_embed = await self.bot.initialize_quickchart_embed(player)
             max_troop_size = datas[0][-1]
             percentage_6_tier = round((sum([data[1] for data in datas if data[2] == 6]) * 100) / datas[0][-1], 1)
             percentage_5_tier = round((sum([data[1] for data in datas if data[2] == 5]) * 100) / datas[0][-1], 1)

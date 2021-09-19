@@ -111,7 +111,7 @@ class DB:
         c.execute("""SELECT name, quantity, tier, max_troop_size FROM quantities q 
         join troops t on q.troop_id = t.id
         join players p on p.id = q.player_id
-        where commander_name=%s""", t)
+        where commander_name=%s order by quantity desc""", t)
         datas = c.fetchall()
         conn.close()
 
