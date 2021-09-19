@@ -38,3 +38,16 @@ def construct_leaderboard_embed(self, embed: discord.Embed, datas: list):
         text='Points attribution is based on troops tier, quantity, and current PvP meta.')
 
     return embed
+
+
+def construct_quickchart_embed(self, embed: discord.Embed, quickchart_url: str, max_troop_size: str,
+                               percentage_6_tier: float, percentage_5_tier: float):
+    embed.set_image(url=quickchart_url)
+    embed.set_thumbnail(url='https://tinyurl.com/38wauca2')
+    embed.add_field(name='Max Army Size', value=max_troop_size)
+    embed.add_field(name='Percentage of 6 Tier troops',
+                    value=f'{percentage_6_tier} %')
+    embed.add_field(name='Percentage of 5 Tier troops',
+                    value=f'{percentage_5_tier} %')
+
+    return embed

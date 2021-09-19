@@ -9,6 +9,7 @@ import tesseract
 import cv2
 import database
 import embeds
+import quickchart_army
 
 load_dotenv()
 
@@ -60,6 +61,14 @@ class ArmyBot(commands.Bot):
                         'Then, you have to attach your max troop size with your image, like shown in the image:'
                         '\n\n'
                         'And press Enter.'
+        )
+
+        return embed
+
+    async def initialize_quickchart_embed(self, player: str):
+        embed = discord.Embed(
+            title=f'{player}\'s Stats',
+            color=discord.Colour.purple(),
         )
 
         return embed
@@ -130,7 +139,7 @@ class ArmyBodCmd(commands.Cog):
     def __init__(self, _bot):
         self.bot = _bot
 
-    @commands.command(name='manual')
+    @commands.command(name='manual', help='Explain how to use the manual input system.')
     async def display_manual_embed(self, ctx):
         embed = await self.bot.initialize_manual_embed()
         embed.set_thumbnail(url='https://tinyurl.com/38wauca2'),
@@ -139,20 +148,36 @@ class ArmyBodCmd(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @commands.command(name='ocr')
+    @commands.command(name='ocr', help='Explain how to upload an image to register your army.')
     async def display_ocr_embed(self, ctx):
         embed = await self.bot.initialize_ocr_embed()
         embed.set_thumbnail(url='https://tinyurl.com/yettvk3w')
 
         await ctx.send(embed=embed)
 
-    @commands.command(name='leaderboard')
+    @commands.command(name='leaderboard', help='Display the Top 20 players in the clan.')
     async def display_leaderboard_embed(self, ctx):
         initialized_embed = await self.bot.initialize_leaderboard_embed()
         datas = db.leaderboard()
         embed = embeds.construct_leaderboard_embed(self, initialized_embed, datas)
 
         await ctx.send(embed=embed)
+
+    @commands.command(name='stats', help='/stats player_name will display a chart describing the army of the player.')
+    async def display_quickchart(self, ctx, arg):
+        datas = db.get_player_stats(arg)
+        if datas:
+            url = quickchart_army.get_quickchart([int(data[1]) for data in datas], [data[0] for data in datas])
+            initialized_embed = await self.bot.initialize_quickchart_embed(arg)
+            max_troop_size = datas[0][-1]
+            percentage_6_tier = round((sum([data[1] for data in datas if data[2] == 6]) * 100) / datas[0][-1], 1)
+            percentage_5_tier = round((sum([data[1] for data in datas if data[2] == 5]) * 100) / datas[0][-1], 1)
+            embed = embeds.construct_quickchart_embed(self, initialized_embed, url, max_troop_size, percentage_6_tier, percentage_5_tier)
+
+            await ctx.send(embed=embed)
+
+        else:
+            await ctx.send('This Player doesn\'t exist in the database.')
 
 
 army_bot = ArmyBot()

@@ -104,8 +104,22 @@ class DB:
 
         return datas
 
+    def get_player_stats(self, commander_name):
+        conn.reconnect()
+        c = conn.cursor()
+        t = (commander_name,)
+        c.execute("""SELECT name, quantity, tier, max_troop_size FROM quantities q 
+        join troops t on q.troop_id = t.id
+        join players p on p.id = q.player_id
+        where commander_name=%s""", t)
+        datas = c.fetchall()
+        conn.close()
+
+        return datas
+
+
 
 if __name__ == '__main__':
     db = DB()
-    datas = db.leaderboard()
+    datas = db.get_player_stats('Joakim')
     print(datas)
