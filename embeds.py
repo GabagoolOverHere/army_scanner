@@ -1,12 +1,12 @@
 import discord
 
 
-def construct_embed(self, embed: discord.Embed, author: str, icon: str, commander_name: str, max_troop_size: str,
-                    troops_scanned: str, troops: list,
-                    thumbnail_url='https://tinyurl.com/38wauca2',
-                    footer='React with \U0001F197 (:ok:) if the scan seems to be correct.\n'
-                           'React with \U0000274C (:x:) if the scan seems to be incorrect.\n'
-                           'Click on your discord name in the message to access the clan\'s stats'):
+def construct_main_embed(self, embed: discord.Embed, author: str, icon: str, commander_name: str, max_troop_size: str,
+                         troops_scanned: str, troops: list,
+                         thumbnail_url='https://tinyurl.com/38wauca2',
+                         footer='React with \U0001F197 (:ok:) if the scan seems to be correct.\n'
+                                'React with \U0000274C (:x:) if the scan seems to be incorrect.\n'
+                                'Click on your discord name in the message to access the clan\'s stats'):
     embed.set_author(name=author, url='https://gabagool.fr', icon_url=icon)
     embed.add_field(name='Commander Name:', value=commander_name)
     embed.add_field(name='Max Troop Size:', value=max_troop_size)
@@ -17,3 +17,24 @@ def construct_embed(self, embed: discord.Embed, author: str, icon: str, commande
         embed.add_field(name=data[0] + ':', value=data[1], inline=True)
     embed.set_footer(
         text=footer)
+
+
+def construct_leaderboard_embed(self, embed: discord.Embed, datas: list):
+    final_datas = ''
+    i = 1
+    for data in datas:
+        if i == 1:
+            final_datas += f'\U0001F947 {data[0]}: {int(data[1])} points\n'
+        elif i == 2:
+            final_datas += f'\U0001F948 {data[0]}: {int(data[1])} points\n'
+        elif i == 3:
+            final_datas += f'\U0001F949 {data[0]}: {int(data[1])} points\n-----------------------\n'
+        elif i > 3:
+            final_datas += f'#{i} {data[0]}: {int(data[1])} points\n'
+        i += 1
+    embed.add_field(name='Top 20\n-----------------------', value=final_datas)
+    embed.set_thumbnail(url='https://tinyurl.com/38wauca2')
+    embed.set_footer(
+        text='Points attribution is based on troops tier, quantity, and current PvP meta.')
+
+    return embed

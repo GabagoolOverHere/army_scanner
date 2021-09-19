@@ -22,7 +22,7 @@ class DB:
         else:
             player_id = self.find_player_by_name(message_author)
             self.update_player(commander_name, message_content,
-                             player_id[0])
+                               player_id[0])
             self.delete_troops(player_id[0])
 
     def create_player(self, discord_name: str, commander_name: str, max_troop_size: int,
@@ -90,13 +90,22 @@ class DB:
         conn.commit()
         conn.close()
 
+    def leaderboard(self):
+        conn.reconnect()
+        c = conn.cursor()
+        c.execute("""select commander_name, sum(tier*quantity) as points from troops t 
+        join quantities q on q.troop_id = t.id 
+        join players p on q.player_id = p.id 
+        GROUP by commander_name
+        order by points desc
+        limit 20""")
+        datas = c.fetchall()
+        conn.close()
+
+        return datas
+
 
 if __name__ == '__main__':
     db = DB()
-    datas = ['Sturgian Spearman 5', 'Battanian Veteran Falxman 3', 'Battanian Wildling 3', 'Sturgian Horse Raider 3',
-             'Sturgian Warrior 1', 'Sturgian Soldier 3', 'Sturgian Heavy Axeman 29', 'imperial Legionary 3',
-             'Khuzait Heavy Horse Archer 1', 'Sturgian Hunter 2', 'Battanian Mounted Skirmisher 1',
-             'Sturgian Veteran Bowman 9', 'Imperial Recruit 1', 'Battanian Clan Warrior 7', 'Sturgian Archer 7']
-    sorted_data = [data.rsplit(' ', 1) for data in datas]
-
-    db.fill_troops(sorted_data, 'Gabagool#6402')
+    datas = db.leaderboard()
+    print(datas)
