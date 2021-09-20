@@ -30,6 +30,18 @@ class ArmyBot(commands.Bot):
 
         return embed
 
+    async def initialize_help_embed(self):
+        embed = discord.Embed(
+            color=discord.Colour.purple(),
+            title='Army Bot Commands',
+            description='/manual : guides you through the manual input system, which allow you to register your army by typing directly in the chat. Useful if you have only 1 or 2 types of units.\n'
+                        '/ocr : guides you through the image input system. Upload a image of your army, the bot will do the rest. Useful if you have a large variety of troops.\n'
+                        '/leaderboard : Allow you to see the 20 best commanders in the clan.\n'
+                        '/stats : See statistics about a player and his / her army.'
+        )
+
+        return embed
+
     async def initialize_manual_embed(self):
         embed = discord.Embed(
             color=discord.Colour.purple(),
@@ -139,6 +151,13 @@ class ArmyBodCmd(commands.Cog):
     def __init__(self, _bot):
         self.bot = _bot
 
+    @commands.command(name='commands', help='Gives you the available commands, and their purpose.')
+    async def display_help_embed(self, ctx):
+        embed = await self.initialize_help_embed()
+        embed.set_thumbnail(url='https://tinyurl.com/38wauca2')
+
+        await ctx.send(embed=embed)
+
     @commands.command(name='manual', help='Explain how to use the manual input system.')
     async def display_manual_embed(self, ctx):
         embed = await self.bot.initialize_manual_embed()
@@ -171,8 +190,8 @@ class ArmyBodCmd(commands.Cog):
             url = quickchart_army.get_quickchart([int(data[1]) for data in datas], [data[0] for data in datas])
             initialized_embed = await self.bot.initialize_quickchart_embed(player)
             max_troop_size = datas[0][-1]
-            percentage_6_tier = round((sum([data[1] for data in datas if data[2] == 6]) * 100) / datas[0][-1], 1)
-            percentage_5_tier = round((sum([data[1] for data in datas if data[2] == 5]) * 100) / datas[0][-1], 1)
+            percentage_6_tier = round((sum([data[1] for data in datas if data[2] == 6]) * 100) / datas[0][-1] - 1, 1)
+            percentage_5_tier = round((sum([data[1] for data in datas if data[2] == 5]) * 100) / datas[0][-1] - 1, 1)
             embed = embeds.construct_quickchart_embed(self, initialized_embed, url, max_troop_size, percentage_6_tier, percentage_5_tier)
 
             await ctx.send(embed=embed)
