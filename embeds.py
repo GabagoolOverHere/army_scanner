@@ -1,12 +1,11 @@
 import discord
 
 
-def construct_main_embed(self, embed: discord.Embed, author: str, icon: str, commander_name: str, max_troop_size: str,
-                         troops_scanned: str, troops: list,
-                         thumbnail_url='https://tinyurl.com/38wauca2',
+def construct_main_embed(self, embed: discord.Embed, author: str, icon: str, commander_name: str, max_troop_size: str, troops_scanned: str, troops: list, thumbnail_url='https://tinyurl.com/38wauca2',
                          footer='React with \U0001F197 (:ok:) if the scan seems to be correct.\n'
                                 'React with \U0000274C (:x:) if the scan seems to be incorrect.\n'
                                 'Click on your discord name in the message to access the clan\'s stats'):
+
     embed.set_author(name=author, url='https://gabagool.fr', icon_url=icon)
     embed.add_field(name='Commander Name:', value=commander_name)
     embed.add_field(name='Max Troop Size:', value=max_troop_size)
@@ -20,6 +19,7 @@ def construct_main_embed(self, embed: discord.Embed, author: str, icon: str, com
 
 
 def construct_leaderboard_embed(self, embed: discord.Embed, datas: list):
+
     final_datas = ''
     i = 1
     for data in datas:
@@ -40,14 +40,12 @@ def construct_leaderboard_embed(self, embed: discord.Embed, datas: list):
     return embed
 
 
-def construct_quickchart_embed(self, embed: discord.Embed, quickchart_url: str, max_troop_size: str,
-                               percentage_6_tier: float, percentage_5_tier: float):
+def construct_quickchart_embed(self, embed: discord.Embed, quickchart_url: str, max_troop_size: str, percentage_6_tier: float, percentage_5_tier: float):
+
     embed.set_image(url=quickchart_url)
     embed.set_thumbnail(url='https://tinyurl.com/38wauca2')
     embed.add_field(name='Max Army Size', value=max_troop_size)
-    embed.add_field(name='6 Tier troops',
-                    value=f'{percentage_6_tier} %')
-    embed.add_field(name='5 Tier troops',
-                    value=f'{percentage_5_tier} %')
+    embed.add_field(name='6 Tier troops', value=f'{percentage_6_tier if percentage_6_tier >= 1 else percentage_6_tier + 1} %')
+    embed.add_field(name='5 Tier troops', value=f'{percentage_5_tier if percentage_5_tier >= 1 else percentage_5_tier + 1} %')
 
     return embed
