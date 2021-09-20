@@ -45,9 +45,9 @@ def construct_quickchart_embed(self, embed: discord.Embed, quickchart_url: str, 
     embed.set_image(url=quickchart_url)
     embed.set_thumbnail(url='https://tinyurl.com/38wauca2')
     embed.add_field(name='Max Army Size', value=max_troop_size)
-    embed.add_field(name='Percentage of 6 Tier troops',
+    embed.add_field(name='6 Tier troops',
                     value=f'{percentage_6_tier} %')
-    embed.add_field(name='Percentage of 5 Tier troops',
+    embed.add_field(name='5 Tier troops',
                     value=f'{percentage_5_tier} %')
 
     return embed

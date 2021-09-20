@@ -18,6 +18,21 @@ def get_quickchart(troop_datas: list, troop_labels: list):
             'plugins': {
                 'datalabels': {
                     'color': 'white',
+                    'backgroundColor': '#404040',
+                    'borderRadius': 3,
+                },
+                'doughnutlabel': {
+                    'labels': [{
+                        'color': 'white',
+                        'text': sum(troop_datas),
+                        'font': {
+                            'size': 20,
+                            'weight': 'bold'
+                        }
+                    }, {
+                        'text': 'total',
+                        'color': 'white',
+                    }]
                 }
             },
             'legend': {
