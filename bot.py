@@ -182,7 +182,7 @@ class ArmyBodCmd(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @commands.command(name='statistics', help='Allow you to see stats from a player.')
+    @commands.command(name='stats', help='Allow you to see stats from a player.')
     async def display_quickchart(self, ctx, *arg):
         player = ' '.join(arg)
         datas = db.get_player_stats(player)
@@ -198,7 +198,7 @@ class ArmyBodCmd(commands.Cog):
 
         else:
             if not arg:
-                await ctx.send('/statistics PlayerName will allow you to see statistics about a player.')
+                await ctx.send('/stats PlayerName will allow you to see statistics about a player.')
             else:
                 await ctx.send('This Player doesn\'t exist in the database.')
 
