@@ -6,14 +6,14 @@ def construct_main_embed(self, embed: discord.Embed, author: str, icon: str, com
                                 'React with \U0000274C (:x:) if the scan seems to be incorrect.\n'
                                 'Click on your discord name in the message to access the clan\'s stats'):
 
-    embed.set_author(name=author, url='https://gabagool.fr', icon_url=icon)
+    embed.set_author(name=author, url='https://house-hessian.de/', icon_url=icon)
     embed.add_field(name='Commander Name:', value=commander_name)
     embed.add_field(name='Max Troop Size:', value=max_troop_size)
     embed.add_field(name='Total Troops Scanned:', value=troops_scanned)
     embed.set_thumbnail(
         url=thumbnail_url)
     for data in troops:
-        embed.add_field(name=data[0] + ':', value=data[1], inline=True)
+        embed.add_field(name=data[0], value=data[1], inline=True)
     embed.set_footer(
         text=footer)
 

@@ -36,6 +36,7 @@ def get_quickchart(troop_datas: list, troop_labels: list):
                 }
             },
             'legend': {
+                'position': 'bottom',
                 'labels': {
                     'fontColor': "white",
                 }
