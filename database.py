@@ -28,8 +28,7 @@ class DB:
     def create_player(self, discord_name: str, commander_name: str, max_troop_size: int,
                       now=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')):
         conn.reconnect()
-        c = conn.cursor()
-        d = (discord_name, commander_name, max_troop_size, now)
+        c, d = conn.cursor(), (discord_name, commander_name, max_troop_size, now)
         c.execute(
             """INSERT INTO players(discord_name, commander_name, max_troop_size, submission_date)
             VALUES (%s, %s, %s, %s)""", d)
@@ -38,8 +37,7 @@ class DB:
 
     def find_player_by_name(self, discord_name: str):
         conn.reconnect()
-        c = conn.cursor()
-        d = (discord_name,)
+        c, d = conn.cursor(), (discord_name,)
         c.execute(
             """SELECT id FROM players WHERE discord_name=%s""", d)
         datas = c.fetchone()
@@ -49,8 +47,7 @@ class DB:
 
     def find_troop_by_name(self, troop_name: str):
         conn.reconnect()
-        c = conn.cursor()
-        t = (troop_name,)
+        c, t = conn.cursor(), (troop_name,)
         c.execute("""SELECT id FROM troops WHERE name=%s""", t)
         datas = c.fetchone()
         conn.close()
@@ -60,16 +57,14 @@ class DB:
     def update_player(self, commander_name: str, max_troop_size: int, id: int,
                       now=datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')):
         conn.reconnect()
-        c = conn.cursor()
-        d = (commander_name, max_troop_size, now, id)
+        c, d = conn.cursor(), (commander_name, max_troop_size, now, id)
         c.execute(
             """UPDATE players SET commander_name=%s, max_troop_size=%s, submission_date=%s WHERE id=%s""", d)
         conn.commit()
         conn.close()
 
     def fill_troops(self, sorted_datas: list, discord_name: str):
-        record_to_insert = []
-        player_id = self.find_player_by_name(discord_name)
+        record_to_insert, player_id = [], self.find_player_by_name(discord_name)
         for data in sorted_datas:
             troop_id = self.find_troop_by_name(data[0])
             record_to_insert.append((int(data[1]), troop_id[0], player_id[0]))
@@ -82,9 +77,8 @@ class DB:
         conn.close()
 
     def delete_troops(self, player_id: int):
-        d = (player_id,)
         conn.reconnect()
-        c = conn.cursor()
+        c, d = conn.cursor(), (player_id,)
         c.execute(
             """DELETE from quantities WHERE player_id=%s""", d)
         conn.commit()
@@ -106,8 +100,7 @@ class DB:
 
     def get_player_stats(self, commander_name):
         conn.reconnect()
-        c = conn.cursor()
-        t = (commander_name,)
+        c, t = conn.cursor(), (commander_name,)
         c.execute("""SELECT name, quantity, tier, max_troop_size FROM quantities q 
         join troops t on q.troop_id = t.id
         join players p on p.id = q.player_id
