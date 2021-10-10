@@ -5,5 +5,10 @@ bot_strings = {
     'ocr_error': """Oops, looks like I can\'t read all the units properly. Please, try again with another image if you used the scan system, or check for typos in your message if you used manual input.""",
     'wrong_troop_size': """Attach a valid max troop size with your image (number between 5 and 95). Please retry.""",
     'troop_check': """Check if your max army size is between 5 and 95 (commander included) and the number of each troop you typed is correct.""",
-    'manual_command_example': """Here is an example:\n"Gabagool(91): Imperial Palatine Guard/14, Vlandian Sharpshooter/49, Imperial Legionary/19" (without the quotation marks)"""
+    'manual_command_example': """Here is an example:\n"Gabagool(91): Imperial Palatine Guard/14, Vlandian Sharpshooter/49, Imperial Legionary/19" (without the quotation marks)""",
+    'unknown_command': """Unknown command. Please type /commands to see the available commands."""
 }
+
+
+def construct_troop_size_error(nb_given: int):
+    return f'The number you gave is inferior to the sum of all the troops I scanned ({nb_given + 1}, commander included). Please, retry.'

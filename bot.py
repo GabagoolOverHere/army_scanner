@@ -74,7 +74,8 @@ class ArmyBot(commands.Bot):
 
         return embed
 
-    async def fill_datas(self, message: discord.Message, author: str, commander_name: str, max_troop_size: int, sorted_datas: list, sum_of_troops: int):
+    async def fill_datas(self, message: discord.Message, author: str, commander_name: str, max_troop_size: int,
+                         sorted_datas: list, sum_of_troops: int):
         db.prepare_datas_for_database(author, commander_name, max_troop_size)
 
         try:
@@ -117,7 +118,7 @@ class ArmyBot(commands.Bot):
                                               sorted_datas, total_troops_scanned)
                     else:
                         await message.channel.send(
-                            f'The number you gave is inferior to the sum of all the troops I scanned ({total_troops_scanned + 1}, commander included). Please, retry.')
+                            bs.construct_troop_size_error(total_troops_scanned))
 
                 else:
                     await message.channel.send(bs.bot_strings['wrong_troop_size'])
@@ -141,6 +142,11 @@ class ArmyBot(commands.Bot):
 class ArmyBodCmd(commands.Cog):
     def __init__(self, _bot):
         self.bot = _bot
+
+    @commands.Cog.listener()
+    async def on_command_error(self, ctx, error):
+        if isinstance(error, commands.CommandNotFound):
+            await ctx.send(bs.bot_strings['unknown_command'])
 
     @commands.command(name='commands', help='Gives you the available commands, and their purpose.')
     async def display_help_embed(self, ctx):
