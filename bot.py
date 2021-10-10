@@ -74,8 +74,7 @@ class ArmyBot(commands.Bot):
 
         return embed
 
-    async def fill_datas(self, message: discord.Message, author: str, commander_name: str, max_troop_size: int,
-                         sorted_datas: list, sum_of_troops: int):
+    async def fill_datas(self, message: discord.Message, author: str, commander_name: str, max_troop_size: int, sorted_datas: list, sum_of_troops: int):
         db.prepare_datas_for_database(author, commander_name, max_troop_size)
 
         try:
@@ -128,8 +127,7 @@ class ArmyBot(commands.Bot):
         elif message.content.startswith('/'):
             await self.process_commands(message)
         elif re.fullmatch(r'[A-Za-z]+\([0-9]{1,2}\): ?(([A-Za-z]+ )+[A-Za-z]+\/[0-9]{1,2},? ?)+', message.content):
-            commander_infos = message.content.split(':')[0]
-            commander_name = message.content.split('(')[0]
+            commander_infos, commander_name = message.content.split(':')[0], message.content.split('(')[0]
             max_army_size = int(commander_infos.split('(')[1].rstrip(')'))
             sorted_datas = [data.strip(' ').split('/') for data in message.content.split(':')[1].split(',')]
             troop_nb_scanned = sum([int(data[1]) for data in sorted_datas])
@@ -181,8 +179,7 @@ class ArmyBodCmd(commands.Cog):
         datas = db.get_player_stats(player)
         if datas:
             url = quickchart_army.get_quickchart([int(data[1]) for data in datas], [data[0] for data in datas])
-            initialized_embed = await self.bot.initialize_quickchart_embed(player)
-            max_troop_size = datas[0][-1]
+            initialized_embed, max_troop_size = await self.bot.initialize_quickchart_embed(player), datas[0][-1]
             percentage_6_tier = round((sum([data[1] for data in datas if data[2] == 6]) * 100) / datas[0][-1] - 1, 1)
             percentage_5_tier = round((sum([data[1] for data in datas if data[2] == 5]) * 100) / datas[0][-1] - 1, 1)
             embed = embeds.construct_quickchart_embed(self, initialized_embed, url, max_troop_size, percentage_6_tier,
