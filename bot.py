@@ -10,6 +10,7 @@ import cv2
 import database
 import embeds
 import quickchart_army
+import bot_strings as bs
 
 load_dotenv()
 
@@ -34,10 +35,7 @@ class ArmyBot(commands.Bot):
         embed = discord.Embed(
             color=discord.Colour.purple(),
             title='Army Bot Commands',
-            description='/manual : guides you through the manual input system, which allow you to register your army by typing directly in the chat. Useful if you have only 1 or 2 types of units.\n\n'
-                        '/ocr : guides you through the image input system. Upload a image of your army, the bot will do the rest. Useful if you have a large variety of troops.\n\n'
-                        '/leaderboard : Allow you to see the 20 best commanders in the clan.\n\n'
-                        '/stats : See statistics about a player and his / her army.'
+            description=bs.bot_strings['help_bot_description']
         )
 
         return embed
@@ -46,11 +44,7 @@ class ArmyBot(commands.Bot):
         embed = discord.Embed(
             color=discord.Colour.purple(),
             title='Manual Input',
-            description='To manually register your army, follow the following pattern in a SINGLE MESSAGE:\n\n'
-                        'Your Commander Name(Your Max Army Size): Troop Name/Number, '
-                        'Troop Name/Number, '
-                        '...\n\n'
-                        'And press Enter.'
+            description=bs.bot_strings['manual_bot_description']
         )
 
         return embed
@@ -67,12 +61,7 @@ class ArmyBot(commands.Bot):
         embed = discord.Embed(
             color=discord.Colour.purple(),
             title='OCR Input',
-            description='The OCR technology allow us to extract text from an image.\n\n'
-                        'To register your army, you have to upload a cropped screenshot of your army that you can get by pressing ALT, and hovering your cursor over your army, when you\'re on the map.'
-                        '\n\n'
-                        'Then, you have to attach your max troop size with your image, like shown in the image:'
-                        '\n\n'
-                        'And press Enter.'
+            description=bs.bot_strings['ocr_bot_description']
         )
 
         return embed
@@ -93,11 +82,12 @@ class ArmyBot(commands.Bot):
             db.fill_troops(sorted_datas, author)
         except TypeError:
             await message.channel.send(
-                'Oops, looks like I can\'t read all the units properly. Please, try again with another image if you used the scan system, or check for typos in your message if you used manual input.')
+                bs.bot_strings['ocr_error'])
             return
 
         embed = await self.initialize_embed()
-        embeds.construct_main_embed(self, embed, message.author, message.author.avatar_url, commander_name, str(max_troop_size), str(sum_of_troops + 1), sorted_datas)
+        embeds.construct_main_embed(self, embed, message.author, message.author.avatar_url, commander_name,
+                                    str(max_troop_size), str(sum_of_troops + 1), sorted_datas)
 
         await message.channel.send(embed=embed)
 
@@ -116,20 +106,22 @@ class ArmyBot(commands.Bot):
                         await message.channel.send('Image is invalid. Please, retry')
                         return
                     try:
-                        total_troops_scanned = sum([int(re.search('[0-9]{1,2}', data).group(0)) for data in datas if not data.endswith('%')])
+                        total_troops_scanned = sum(
+                            [int(re.search('[0-9]{1,2}', data).group(0)) for data in datas if not data.endswith('%')])
                     except AttributeError:
                         await message.channel.send('Image is invalid. Please, retry')
                         return
                     sorted_datas = [data.rsplit(' ', 1) for data in datas if not data.endswith('%')]
 
                     if total_troops_scanned < int(message.content):
-                        await self.fill_datas(message, str(message.author), commander_name, message.content, sorted_datas, total_troops_scanned)
+                        await self.fill_datas(message, str(message.author), commander_name, message.content,
+                                              sorted_datas, total_troops_scanned)
                     else:
                         await message.channel.send(
                             f'The number you gave is inferior to the sum of all the troops I scanned ({total_troops_scanned + 1}, commander included). Please, retry.')
 
                 else:
-                    await message.channel.send('Attach a valid max troop size with your image (number between 5 and 95). Please retry.')
+                    await message.channel.send(bs.bot_strings['wrong_troop_size'])
 
             else:
                 await message.channel.send('You have to upload an image.')
@@ -142,9 +134,10 @@ class ArmyBot(commands.Bot):
             sorted_datas = [data.strip(' ').split('/') for data in message.content.split(':')[1].split(',')]
             troop_nb_scanned = sum([int(data[1]) for data in sorted_datas])
             if 96 > max_army_size > 4 and max_army_size > troop_nb_scanned:
-                await self.fill_datas(message, str(message.author), commander_name, max_army_size, sorted_datas, troop_nb_scanned)
+                await self.fill_datas(message, str(message.author), commander_name, max_army_size, sorted_datas,
+                                      troop_nb_scanned)
             else:
-                await message.channel.send('Check if your max army size is between 5 and 95 (commander included) and the number of each troop you typed is correct.')
+                await message.channel.send(bs.bot_strings['troop_check'])
 
 
 class ArmyBodCmd(commands.Cog):
@@ -163,7 +156,7 @@ class ArmyBodCmd(commands.Cog):
         embed = await self.bot.initialize_manual_embed()
         embed.set_thumbnail(url='https://tinyurl.com/38wauca2'),
         embed.set_footer(
-            text='Here is an example:\n"Gabagool(91): Imperial Palatine Guard/14, Vlandian Sharpshooter/49, Imperial Legionary/19" (without the quotation marks)')
+            text=bs.bot_strings['manual_command_example'])
 
         await ctx.send(embed=embed)
 
@@ -192,7 +185,8 @@ class ArmyBodCmd(commands.Cog):
             max_troop_size = datas[0][-1]
             percentage_6_tier = round((sum([data[1] for data in datas if data[2] == 6]) * 100) / datas[0][-1] - 1, 1)
             percentage_5_tier = round((sum([data[1] for data in datas if data[2] == 5]) * 100) / datas[0][-1] - 1, 1)
-            embed = embeds.construct_quickchart_embed(self, initialized_embed, url, max_troop_size, percentage_6_tier, percentage_5_tier)
+            embed = embeds.construct_quickchart_embed(self, initialized_embed, url, max_troop_size, percentage_6_tier,
+                                                      percentage_5_tier)
 
             await ctx.send(embed=embed)
 
