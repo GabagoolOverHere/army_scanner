@@ -21,8 +21,7 @@ def construct_main_embed(self, embed: discord.Embed, author: str, icon: str, com
 def construct_leaderboard_embed(self, embed: discord.Embed, datas: list):
 
     final_datas = ''
-    i = 1
-    for data in datas:
+    for i, data in enumerate(datas, start=1):
         if i == 1:
             final_datas += f'\U0001F947 {data[0]}: {int(data[1])} points\n'
         elif i == 2:
@@ -31,7 +30,6 @@ def construct_leaderboard_embed(self, embed: discord.Embed, datas: list):
             final_datas += f'\U0001F949 {data[0]}: {int(data[1])} points\n-----------------------\n'
         elif i > 3:
             final_datas += f'#{i} {data[0]}: {int(data[1])} points\n'
-        i += 1
     embed.add_field(name='Top 20\n-----------------------', value=final_datas)
     embed.set_thumbnail(url='https://tinyurl.com/38wauca2')
     embed.set_footer(

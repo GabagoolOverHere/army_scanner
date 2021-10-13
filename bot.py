@@ -25,54 +25,42 @@ class ArmyBot(commands.Bot):
         print(f'The bot {self.user.display_name} is ready.')
 
     async def initialize_embed(self):
-        embed = discord.Embed(
+        return discord.Embed(
             color=discord.Colour.purple(),
         )
 
-        return embed
-
     async def initialize_help_embed(self):
-        embed = discord.Embed(
+        return discord.Embed(
             color=discord.Colour.purple(),
             title='Army Bot Commands',
             description=bs.bot_strings['help_bot_description']
         )
 
-        return embed
-
     async def initialize_manual_embed(self):
-        embed = discord.Embed(
+        return discord.Embed(
             color=discord.Colour.purple(),
             title='Manual Input',
             description=bs.bot_strings['manual_bot_description']
         )
 
-        return embed
-
     async def initialize_leaderboard_embed(self):
-        embed = discord.Embed(
+        return discord.Embed(
             color=discord.Colour.purple(),
             title='Housse Hessian Hall Of Fame',
         )
 
-        return embed
-
     async def initialize_ocr_embed(self):
-        embed = discord.Embed(
+        return discord.Embed(
             color=discord.Colour.purple(),
             title='OCR Input',
             description=bs.bot_strings['ocr_bot_description']
         )
 
-        return embed
-
     async def initialize_quickchart_embed(self, player: str):
-        embed = discord.Embed(
+        return discord.Embed(
             title=f'{player}\'s Stats',
             color=discord.Colour.purple(),
         )
-
-        return embed
 
     async def fill_datas(self, message: discord.Message, author: str, commander_name: str, max_troop_size: int,
                          sorted_datas: list, sum_of_troops: int):
@@ -107,7 +95,11 @@ class ArmyBot(commands.Bot):
                         return
                     try:
                         total_troops_scanned = sum(
-                            [int(re.search('[0-9]{1,2}', data).group(0)) for data in datas if not data.endswith('%')])
+                            int(re.search('[0-9]{1,2}', data).group(0))
+                            for data in datas
+                            if not data.endswith('%')
+                        )
+
                     except AttributeError:
                         await message.channel.send('Image is invalid. Please, retry')
                         return
@@ -131,7 +123,7 @@ class ArmyBot(commands.Bot):
             commander_infos, commander_name = message.content.split(':')[0], message.content.split('(')[0]
             max_army_size = int(commander_infos.split('(')[1].rstrip(')'))
             sorted_datas = [data.strip(' ').split('/') for data in message.content.split(':')[1].split(',')]
-            troop_nb_scanned = sum([int(data[1]) for data in sorted_datas])
+            troop_nb_scanned = sum(int(data[1]) for data in sorted_datas)
             if 96 > max_army_size > 4 and max_army_size > troop_nb_scanned:
                 await self.fill_datas(message, str(message.author), commander_name, max_army_size, sorted_datas,
                                       troop_nb_scanned)
@@ -186,18 +178,27 @@ class ArmyBodCmd(commands.Cog):
         if datas:
             url = quickchart_army.get_quickchart([int(data[1]) for data in datas], [data[0] for data in datas])
             initialized_embed, max_troop_size = await self.bot.initialize_quickchart_embed(player), datas[0][-1]
-            percentage_6_tier = round((sum([data[1] for data in datas if data[2] == 6]) * 100) / datas[0][-1] - 1, 1)
-            percentage_5_tier = round((sum([data[1] for data in datas if data[2] == 5]) * 100) / datas[0][-1] - 1, 1)
+            percentage_6_tier = round(
+                sum(data[1] for data in datas if data[2] == 6) * 100 / datas[0][-1]
+                - 1,
+                1,
+            )
+
+            percentage_5_tier = round(
+                sum(data[1] for data in datas if data[2] == 5) * 100 / datas[0][-1]
+                - 1,
+                1,
+            )
+
             embed = embeds.construct_quickchart_embed(self, initialized_embed, url, max_troop_size, percentage_6_tier,
                                                       percentage_5_tier)
 
             await ctx.send(embed=embed)
 
+        elif not arg:
+            await ctx.send('/stats PlayerName will allow you to see statistics about a player.')
         else:
-            if not arg:
-                await ctx.send('/stats PlayerName will allow you to see statistics about a player.')
-            else:
-                await ctx.send('This Player doesn\'t exist in the database.')
+            await ctx.send('This Player doesn\'t exist in the database.')
 
 
 army_bot = ArmyBot()

@@ -37,8 +37,8 @@ def binary_image(url):
     """
     initial_image = url_to_image(url)
     gray_img = cv2.cvtColor(initial_image, cv2.COLOR_RGB2GRAY)
-    inverted_img = cv2.bitwise_not(gray_img)
-    return inverted_img
+
+    return cv2.bitwise_not(gray_img)
 
 
 def unsharp_mask(image, kernel_size=(9, 9), sigma=1.1, amount=2.5, threshold=0):
@@ -76,9 +76,11 @@ def scan_image(image):
 
     """
     scanned_img = unsharp_mask(binary_image(image))
-    results = [result for result in pytesseract.image_to_string(scanned_img).split('\n') if
-               result not in ('', ' ', '\x0c')]
-    return results
+    return [
+        result
+        for result in pytesseract.image_to_string(scanned_img).split('\n')
+        if result not in ('', ' ', '\x0c')
+    ]
 
 
 if __name__ == '__main__':
